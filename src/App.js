@@ -10,7 +10,8 @@ import axios from "axios";
 import PostService from "./components/API/PostService";
 import MyLoader from "./components/UI/loader/MyLoader";
 import {useFetching} from "./hooks/useFetching";
-import {getPageCount} from "./utils/pages";
+import {getPageCount, getPagesArray} from "./utils/pages";
+import MyPagination from "./components/UI/pagination/MyPagination";
 
 function App() {
     const [posts, setPosts] = useState([])
@@ -22,17 +23,22 @@ function App() {
     const [page, setPage] = useState(1)
 
     const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
-    const [fetchPosts, isPostLoading, postError] = useFetching(async () => {
-        const res = await PostService.getAll()
+    const [pagesArray, setPagesArray] = useState([])
+
+    useMemo(() => {
+        setPagesArray(getPagesArray(totalPages))
+    }, [totalPages])
+
+
+    const [fetchPosts, isPostLoading, postError] = useFetching(async (limit,page) => {
+        const res = await PostService.getAll(limit,page)
         setPosts(res.data)
         const totalCount = Number(res.headers['x-total-count'])
         setTotalPages(getPageCount(totalCount, limit))
     })
 
-    console.log(totalPages)
-
     useEffect(() => {
-        fetchPosts()
+        fetchPosts(limit, page)
     }, [])
 
     const createPost = (newPost) => {
@@ -42,6 +48,11 @@ function App() {
 
     const removePost = (post) => {
         setPosts(posts.filter(p => p.id !== post.id))
+    }
+
+    const changePage = (page) => {
+        setPage(page)
+        fetchPosts(limit, page)
     }
 
     return (
@@ -65,7 +76,11 @@ function App() {
                     : <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Посты про js"/>
 
                 }
+
+                <MyPagination page={page} changePage={changePage} pagesArray={pagesArray}></MyPagination>
+
             </div>
+
         </div>
     );
 }

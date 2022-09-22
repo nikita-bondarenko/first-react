@@ -27,7 +27,7 @@
 }
 
 .post.enter {
-    transform: translateX(-100%);
+    transform: translateX(-130%);
 
 }
 
@@ -41,6 +41,22 @@
 }
 
 .post.exit-active {
-    transform: translateX(-100%);
+    transform: translateX(-130%);
     transition: all 500ms ease-in;
+}
+
+.page__wrapper {
+    margin-top: 30px;
+    display: flex;
+}
+
+.page {
+    padding: 10px;
+    border: 1px solid teal;
+    cursor: pointer;
+}
+
+.page__current {
+    border: 2px solid orange;
+    font-width: bold;
 }
